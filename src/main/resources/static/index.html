@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <style>
+        .card-img-top {
+        width: 100%;
+        height: 15vw;
+        object-fit: cover;}
+    </style>
+    <title>Burgers-Venue</title>
+
+</head>
+<body>
+<div class="container pt-3" id="app">
+    <h1>Burger Joints</h1>
+
+    <div class="row row-cols-1 row-cols-md-3">
+        <div class="col mb-4" v-for="venue in venues">
+            <div class="card">
+                <img src="https://fastly.4sqi.net/img/general/300x500/14084990_ntySOe1rwVexp875gP_2FIMMFUyGfIsookMKGhheQh4.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{venue.name}}</h5>
+                    <p class="card-text">
+                        <button class="btn btn-primary" @click="viewOnMap(venue.location)">View on map</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
