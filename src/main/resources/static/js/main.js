@@ -1,5 +1,3 @@
-import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.esm.browser.js'
-
 async function request(url, method = 'GET') {
     try {
         const response = await fetch(url, {
