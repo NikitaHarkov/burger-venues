@@ -1,8 +1,7 @@
 package ee.mrnikita.burger.contollers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import ee.mrnikita.burger.models.Venue;
-import ee.mrnikita.burger.service.BurgerService;
+import ee.mrnikita.burger.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,17 +11,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/burgers")
-public class BurgerController {
-    private final BurgerService burgerService;
+public class VenuesController {
+    private final VenueService venueService;
 
     @Autowired
-    public BurgerController(BurgerService burgerService) {
-        this.burgerService = burgerService;
+    public VenuesController(VenueService venueService) {
+        this.venueService = venueService;
     }
 
     @GetMapping
-    public List<Venue> list() throws JsonProcessingException {
-        return burgerService.getVenues();
+    public List<Venue> list() {
+        return venueService.getVenues();
     }
 
 }

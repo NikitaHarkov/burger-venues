@@ -9,11 +9,12 @@
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <style>
         .card-img-top {
-        width: 100%;
-        height: 15vw;
-        object-fit: cover;}
+            width: 100%;
+            height: 15vw;
+            object-fit: cover;
+        }
 
-        [v-cloak]{
+        [v-cloak] {
             display: none;
         }
     </style>
@@ -21,22 +22,25 @@
 
 </head>
 <body>
-<div class="container pt-3" id="app" v-cloak>
-    <h1>Burger Joints</h1>
+<div class="container pt-1" id="app" v-cloak>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="navbar-brand">Burger Joints</div>
+    </nav>
+
 
     <div v-if="loading">
-        <loader />
+        <loader/>
     </div>
 
-    <div  v-else-if="venues.length">
-        <div class="row row-cols-1 row-cols-md-3">
+    <div v-else-if="venues.length">
+        <div class="row row-cols-1 row-cols-md-3 pt-2">
             <div class="col mb-4" v-for="venue in venues">
                 <div class="card">
                     <img :src="venue.photoUrl" class="card-img-top" alt="No image">
                     <div class="card-body">
                         <h5 class="card-title">{{venue.name}}</h5>
                         <p class="card-text">{{venue.location.state}}</p>
-                        <button class="btn btn-primary" @click="viewOnMap(venue)">View on map</button>
+                        <button class="btn btn-primary" @click="viewOnMap(venue.location)">View on map</button>
                     </div>
                 </div>
             </div>

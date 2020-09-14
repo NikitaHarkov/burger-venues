@@ -13,7 +13,7 @@ async function request(url, method = 'GET') {
 
 Vue.component('loader', {
     template: `
-    <div style="display: flex; justify-content: center; align-items: center" >
+    <div style="display: flex; justify-content: center; align-items: center" class="pt-2">
         <div class="spinner-border text-warning" role="status">
             <span class="sr-only">Loading...</span>
         </div>
@@ -30,8 +30,8 @@ new Vue({
         }
     },
     methods: {
-        viewOnMap(venue) {
-            const location = venue.location.lat + ", " + venue.location.lng
+        viewOnMap(coordinates) {
+            const location = coordinates.lat + ", " + coordinates.lng
             const url = "https://maps.google.com/?q=" + location
             window.open(url)
         }
@@ -41,5 +41,4 @@ new Vue({
         this.venues = await request('/api/burgers')
         this.loading = false
     }
-
 })
