@@ -11,6 +11,16 @@ async function request(url, method = 'GET') {
     }
 }
 
+Vue.component('loader', {
+    template: `
+    <div style="display: flex; justify-content: center; align-items: center" >
+        <div class="spinner-border text-warning" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    `
+})
+
 new Vue({
     el: "#app",
     data() {
@@ -20,12 +30,16 @@ new Vue({
         }
     },
     methods: {
-        viewOnMap(location) {
-            console.log(location)
+        viewOnMap(venue) {
+            const location = venue.location.lat + ", " + venue.location.lng
+            const url = "https://maps.google.com/?q=" + location
+            window.open(url)
         }
     },
     async mounted() {
+        this.loading = true
         this.venues = await request('/api/burgers')
+        this.loading = false
     }
 
 })

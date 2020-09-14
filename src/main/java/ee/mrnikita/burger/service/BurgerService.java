@@ -3,7 +3,6 @@ package ee.mrnikita.burger.service;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.TypeRef;
-import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import ee.mrnikita.burger.models.Venue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,30 +21,36 @@ public class BurgerService {
     @Value("${foursquare.version}")
     private String version;
     private static final String FOURSQUARE_URL = "https://api.foursquare.com/v2/venues/search?" +
-            "client_id=%s&client_secret=%s&query=%s&near=%s&v=%s";
+            "client_id=%s&client_secret=%s&query=%s&&near=%s&v=%s";
 
     private final RestTemplate restTemplate;
+    private final BurgerPhotoService photoService;
 
     @Autowired
-    public BurgerService(RestTemplate restTemplate) {
+    public BurgerService(RestTemplate restTemplate, BurgerPhotoService photoService) {
         this.restTemplate = restTemplate;
+        this.photoService = photoService;
     }
 
     public List<Venue> getVenues() {
-        String category = "Burger";
+        String query = "Burger, Food";
         String city = "Tartu";
-        String url = String.format(FOURSQUARE_URL, client_id, client_secret, category, city, version);
+        String url = String.format(FOURSQUARE_URL, client_id, client_secret, query, city, version);
         String json = restTemplate.getForObject(url, String.class);
-        return convertToObject(json);
+        List<Venue> venues = convertToObject(json);
+        return photoService.addPhotoUrlToVenues(venues);
     }
 
     private List<Venue> convertToObject(String json) {
-        Configuration conf = Configuration
+        Configuration conf = getJsonPathConfig();
+        TypeRef<List<Venue>> venueList = new TypeRef<>() {};
+        return JsonPath.using(conf).parse(json).read("$.response.venues", venueList);
+    }
+
+    private Configuration getJsonPathConfig() {
+        return Configuration
                 .builder()
                 .mappingProvider(new JacksonMappingProvider())
-                .jsonProvider(new JacksonJsonProvider())
                 .build();
-        TypeRef<List<Venue>> type = new TypeRef<>() {};
-        return JsonPath.using(conf).parse(json).read("$.response.venues[*]", type);
     }
 }

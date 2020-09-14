@@ -9,6 +9,7 @@ public class Venue implements Serializable {
     private String id;
     private String name;
     private Location location;
+    private String photoUrl;
 
     public String getId() {
         return id;
@@ -32,5 +33,13 @@ public class Venue implements Serializable {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }
