@@ -5,21 +5,21 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.TypeRef;
 import ee.mrnikita.burger.models.Venue;
 import ee.mrnikita.burger.models.VenuePhoto;
-import ee.mrnikita.burger.models.dto.PhotoUrlsDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class VenuePhotoService extends Service {
     private static final Logger log = LoggerFactory.getLogger(VenuePhotoService.class);
+    private static final String NO_BURGER_PHOTO = "https://images-na.ssl-images-amazon.com/images/I/61WEhZbbmSL._AC_SL1194_.jpg";
     private static final String FOURSQUARE_PHOTO_URL = "https://api.foursquare.com/v2/venues/%s/photos?" +
-            "client_id=%s&client_secret=%s&group=%s&v=%s";
+            "client_id=%s&client_secret=%s&v=%s";
 
     private final QminderApiService qminderApiService;
 
@@ -28,40 +28,42 @@ public class VenuePhotoService extends Service {
         this.qminderApiService = qminderApiService;
     }
 
-    public List<Venue> addPhotoUrlToVenues(List<Venue> venues) {
-        List<Venue> venuesWithPhoto = new ArrayList<>();
-        String group = "venue";
+    public void addPhotoUrlToVenues(List<Venue> venues) {
         for (Venue venue : venues) {
             String id = venue.getId();
-            String url = String.format(FOURSQUARE_PHOTO_URL, id, client_id, client_secret, group, version);
-            String json = restTemplate.getForObject(url, String.class);
-            Configuration conf = getJsonPathConfig();
-            TypeRef<List<VenuePhoto>> venuePhotoList = new TypeRef<>() {
-            };
+            String url = String.format(FOURSQUARE_PHOTO_URL, id, client_id, client_secret, version);
             try {
-                List<VenuePhoto> venuePhotos = JsonPath.using(conf)
-                        .parse(json)
-                        .read("$.response.photos.items", venuePhotoList);
+                String json = restTemplate.getForObject(url, String.class);
+                List<VenuePhoto> venuePhotos = parsingPhotoJson(json);
                 if (venuePhotos.size() != 0) {
                     String photoUrl = parseVenuePhotos(venuePhotos);
-                    if (!photoUrl.isBlank()) {
+                    if (!photoUrl.equals(NO_PHOTO)) {
                         venue.setPhotoUrl(photoUrl);
-                        venuesWithPhoto.add(venue);
-                    }
-                }
+                    } else
+                        venue.setPhotoUrl(NO_BURGER_PHOTO);
+                } else
+                    venue.setPhotoUrl(NO_BURGER_PHOTO);
             } catch (Exception ex) {
                 log.error("BurgerPhotoService - addPhotoUrlToVenues", ex);
                 System.out.println("Error in addPhotoUrlToVenues: " + ex);
             }
         }
-        return venuesWithPhoto;
+    }
+
+    private List<VenuePhoto> parsingPhotoJson(String json) {
+        Configuration conf = getJsonPathConfig();
+        TypeRef<List<VenuePhoto>> venuePhotoList = new TypeRef<>() {
+        };
+        return JsonPath.using(conf)
+                .parse(json)
+                .read("$.response.photos.items", venuePhotoList);
     }
 
     private String parseVenuePhotos(List<VenuePhoto> venuePhotos) {
-        List<String> photoUrls = venuePhotos.stream()
+        Map<String, List<String>> photoUrls = venuePhotos.stream()
                 .map(photo -> photo.getPrefix() + photo.getWidth() + "x" + photo.getHeight() + photo.getSuffix())
-                .collect(Collectors.toList());
-        PhotoUrlsDto photoUrlsDto = new PhotoUrlsDto(photoUrls);
-        return qminderApiService.venuePhotoWithBurger(photoUrlsDto);
+                .collect(Collectors.groupingBy(key -> "urls",
+                        Collectors.mapping(photos -> photos, Collectors.toList())));
+        return qminderApiService.venuePhotoWithBurger(photoUrls);
     }
 }

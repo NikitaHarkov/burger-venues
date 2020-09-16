@@ -1,12 +1,14 @@
 package ee.mrnikita.burger.service;
 
-import ee.mrnikita.burger.models.dto.PhotoUrlsDto;
 import ee.mrnikita.burger.models.dto.QminderBurgerResponseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class QminderApiService extends Service {
@@ -17,16 +19,16 @@ public class QminderApiService extends Service {
         super(restTemplate);
     }
 
-    public String venuePhotoWithBurger(PhotoUrlsDto photoUrls) {
+    public String venuePhotoWithBurger(Map<String, List<String>> photoUrls) {
         try {
             QminderBurgerResponseDto response = restTemplate.postForObject(QMINDER_API_URL, photoUrls, QminderBurgerResponseDto.class);
             if (response.getUrlWithBurger() != null)
                 return response.getUrlWithBurger();
         } catch (HttpClientErrorException ex) {
             log.error("QminderApiService - venuePhotoWithBurger" + ex);
-            System.out.println("Error in venuePhotoWithBurger: " + photoUrls.getUrls() + " -> " + ex.getMessage());
-            return "";
+            System.out.println("Error in venuePhotoWithBurger:  -> " + ex.getMessage());
+            return NO_PHOTO;
         }
-        return "";
+        return NO_PHOTO;
     }
 }

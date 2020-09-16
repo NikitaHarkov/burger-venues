@@ -24,12 +24,13 @@ public class VenueService extends Service {
     }
 
     public List<Venue> getVenues() {
-        String query = "Burger, Food";
+        String query = "Burger Food";
         String city = "Tartu";
         String url = String.format(FOURSQUARE_URL, client_id, client_secret, query, city, version);
         String json = restTemplate.getForObject(url, String.class);
         List<Venue> venues = convertToObject(json);
-        return photoService.addPhotoUrlToVenues(venues);
+        photoService.addPhotoUrlToVenues(venues);
+        return venues;
     }
 
     private List<Venue> convertToObject(String json) {

@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 public class Service {
+    protected static final String NO_PHOTO = "No Photo!";
     @Value("${foursquare.client.id}")
     protected String client_id;
     @Value("${foursquare.client.secret}")
